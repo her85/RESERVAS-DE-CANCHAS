@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Reservas</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <h1>Mis Reservas</h1>
+
+  <ul>
+    <% reservas.forEach(reserva => { %>
+      <li>
+        <h3><%= reserva.cancha.nombre %></h3>
+        <p>Fecha: <%= reserva.fecha %></p>
+        <p>Hora: <%= reserva.hora %></p>
+      </li>
+    <% }); %>
+  </ul>
+
+  <a href="/">Volver al inicio</a>
+</body>
+</html>

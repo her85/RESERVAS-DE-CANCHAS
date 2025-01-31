@@ -4,6 +4,7 @@ body {
   padding: 0;
   background-color: #f0f0f0;
   color: #333;
+  text-align: center;
 }
 
 h1, h2, h3 {
@@ -64,4 +65,10 @@ button {
 
 button:hover {
   background-color: #004494;
+}
+
+img {
+  max-width: 45%;
+  height: auto;
+  text-align: center;
 }

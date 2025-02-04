@@ -1,74 +1,25 @@
+/* Estilos personalizados para mejorar la apariencia */
 body {
-  font-family: sans-serif;
-  margin: 0;
-  padding: 0;
-  background-color: #f0f0f0;
-  color: #333;
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* Asegura que el footer se pegue al fondo */
 }
 
-h1, h2, h3 {
-  color: #0056b3; /* Azul para los encabezados */
+main {
+  flex: 1; /* Expande el main para ocupar el espacio disponible */
+  padding: 20px; /* Espacio alrededor del contenido principal */
 }
 
-ul {
-  list-style: none;
-  padding: 0;
-}
-
-li {
-  margin-bottom: 10px;
-  padding: 15px;
-  border: 1px solid #ddd;
-  background-color: #fff;
-  border-radius: 5px;
-}
-
-a {
-  color: #0056b3;
-  text-decoration: none;
-}
-
-a:hover {
-  text-decoration: underline;
-}
-
-form {
-  display: inline-block;
-}
-
-label {
-  display: block;
-  margin-bottom: 5px;
-}
-
-input[type="text"],
-input[type="email"],
-input[type="password"],
-input[type="date"],
-input[type="time"] {
+.hero-image {
   width: 100%;
-  padding: 8px;
-  margin-bottom: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
+  max-height: 500px; /* Ajusta la altura máxima de la imagen principal */
+  object-fit: cover; /* Cubre todo el contenedor sin distorsionar la imagen */
+  border-radius: 8px; /* Bordes redondeados para la imagen */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra para la imagen */
 }
 
-button {
-  background-color: #0056b3;
-  color: #fff;
-  padding: 10px 15px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-button:hover {
-  background-color: #004494;
-}
-
-img {
-  max-width: 45%;
-  height: auto;
+footer {
+  background-color: #f8f9fa; /* Color de fondo para el footer */
+  padding: 10px 0;
   text-align: center;
 }

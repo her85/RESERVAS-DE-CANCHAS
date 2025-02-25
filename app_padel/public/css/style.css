@@ -8,6 +8,7 @@ body {
 main {
   flex: 1; /* Expande el main para ocupar el espacio disponible */
   padding: 20px; /* Espacio alrededor del contenido principal */
+  text-align: center; /* Centra el contenido */
 }
 
 .hero-image {
@@ -16,6 +17,19 @@ main {
   object-fit: cover; /* Cubre todo el contenedor sin distorsionar la imagen */
   border-radius: 8px; /* Bordes redondeados para la imagen */
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra para la imagen */
+}
+
+.navbar {
+  background-color: #378be0; /* Color de fondo para la barra de navegación */
+  text-align: end; /* Alinea los elementos a la derecha */
+  margin: 0; /* Elimina el margen predeterminado */
+  padding: 10px 20px; /* Espacio alrededor de la barra de navegación */
+}
+
+.nav-link {
+  color: white; /* Color del texto de los enlaces */
+  padding: 10px 20px; /* Espacio alrededor de los enlaces */
+  text-decoration: none; /* Quita el subrayado de los enlaces */
 }
 
 footer {

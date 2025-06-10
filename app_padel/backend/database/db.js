@@ -1,9 +1,7 @@
 require('dotenv').config();
-const express = require('express');
+
 const { MongoClient, ServerApiVersion } = require("mongodb");
-const { MONGODB_USR, MONGODB_PWD } =  require("./config/config.js");
-const bodyParser = require('body-parser'); //Middleware
-const app = express();
+const { MONGODB_USR, MONGODB_PWD } =  require("./config");
 
 // Conexión a MongoDB utilizando variables de entorno
 const uri =
@@ -31,23 +29,3 @@ async function connectToDb() {
 
 // Conectamos a la base de datos
 connectToDb();
-
-app.set('view engine', 'ejs');
-app.use(bodyParser.urlencoded({ extended: true }));  // Habilita el análisis de cuerpos de solicitud
-app.use(express.static('public'));
-
-// Rutas
-const canchasRoutes = require('./routes/canchas');
-//const reservasRoutes = require('./routes/reservas');
-//const usuariosRoutes = require('./routes/usuarios');
-
-app.use('/canchas', canchasRoutes);
-//app.use('/reservas', reservasRoutes);
-//app.use('/usuarios', usuariosRoutes);
-
-app.get('/', (req, res) => {
-  res.render('index');
-});
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Servidor iniciado en el puerto http://localhost:${PORT}`));

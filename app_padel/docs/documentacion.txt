@@ -36,3 +36,47 @@ Escalabilidad: Diseñar la aplicación para que pueda manejar un gran número de
 Pruebas: Realizar pruebas unitarias e integrales para garantizar la calidad del código.
 Diseño: Crear una interfaz de usuario intuitiva y atractiva.
 Optimización: Optimizar el rendimiento de la aplicación para que sea rápida y responsiva
+
+
+
+Arquitectura de capas
+
+app-padel/
+├── backend/
+│   ├── models/
+│   │   ├── cancha.js
+│   │   ├── reserva.js
+│   │   └── usuario.js
+│   ├── routes/
+│   │   ├── canchas.js
+│   │   ├── reservas.js
+│   │   └── usuarios.js
+│   ├── controllers/
+│   │   ├── canchasController.js
+│   │   ├── reservasController.js
+│   │   └── usuariosController.js
+│   ├── database/
+│   │   └── config.js //Configuración de MongoDB
+|   |   └── db.js // MongoDB
+│   ├── app.js
+│   └── package.json
+├── frontend/
+│   ├── public/
+│   │   └── index.html
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── CanchaDetalle.vue
+│   │   │   ├── ReservaForm.vue
+│   │   │   └── RegistroUsuario.vue
+│   │   ├── views/
+│   │   │   ├── Home.vue
+│   │   │   ├── Canchas.vue
+│   │   │   ├── Reservas.vue
+│   │   │   └── Login.vue
+│   │   ├── assets/
+│   │   │   └── style.css
+│   │   ├── App.vue
+│   │   ├── main.js
+│   │   └── router.js
+│   ├── package.json
+├── docs/

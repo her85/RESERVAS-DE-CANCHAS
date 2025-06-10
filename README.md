@@ -1,23 +1,43 @@
-# Canchas-de-padel
+# Canchas de Pádel
+
+Aplicación web para la reserva de canchas de pádel. Permite a los usuarios consultar la disponibilidad, seleccionar fecha y hora, y realizar reservas de manera sencilla.
+
+## Características principales
+- Visualización de disponibilidad de canchas en tiempo real
+- Reserva de canchas por fecha y hora
+- Gestión de usuarios
+- Panel de administración (opcional)
+
+## Tecnologías utilizadas
+- **Node.js**: Entorno de ejecución para la lógica de servidor y API
+- **Express**: Framework web para Node.js
+- **MongoDB**: Base de datos NoSQL para usuarios, canchas y reservas
+- **EJS**: Motor de plantillas para renderizar vistas dinámicas
+- **JavaScript**: Lógica de cliente y servidor
+- **CSS**: Estilos y diseño de la aplicación
+- **Dotenv**: Gestión de variables de entorno
+- **Body-parser**: Middleware para procesar datos de formularios
+
+## Instalación y ejecución
+1. Clona el repositorio:
+   ```bash
+   git clone <url-del-repositorio>
+   ```
+2. Instala las dependencias:
+   ```bash
+   cd RESERVAS CANCHAS/app_padel
+   npm install
+   ```
+3. Configura las variables de entorno en un archivo `.env` (ver ejemplo `.env.example` si existe).
+4. Inicia la aplicación:
+   ```bash
+   npm start
+   ```
+5. Accede a la app desde tu navegador en `http://localhost:3000` (o el puerto configurado).
+
+## Estructura del proyecto
+- `backend/`: Lógica de servidor, rutas, modelos y controladores
+- `frontend/`: Vistas y recursos estáticos
+- `docs/`: Documentación adicional
 
 
-Reserva de canchas: Los usuarios pueden ver la disponibilidad de las canchas, seleccionar una fecha y hora, y reservar la cancha deseada.
-
-
-Herramientas utilizadas:
-
-Node.js: Entorno de ejecución de JavaScript en el servidor para la lógica de la aplicación y la API.
-
-MongoDB: Base de datos NoSQL para almacenar información sobre usuarios, canchas, reservas, etc.
-
-EJS: Motor de plantillas para generar HTML dinámico en el servidor y renderizar las vistas.
-
-JavaScript: Lenguaje de programación para la lógica del cliente (navegador) y la interacción con la API.
-
-CSS: Hojas de estilo para el diseño y la presentación de la aplicación.
-
-Express: Framework web para Node.js que facilita la creación de la API y el manejo de rutas.
-
-Dotenv: Módulo para cargar variables de entorno desde un archivo .env.
-
-Body-parser: Middleware para analizar los datos de las solicitudes HTTP (por ejemplo, formularios) y convertirlos a un formato utilizable.

@@ -6,7 +6,12 @@
 </head>
 <body>
   <h1>Registro</h1>
-
+  <% if (typeof error !== 'undefined' && error) { %>
+    <div class="alert alert-danger"><%= error %></div>
+  <% } %>
+  <% if (typeof success !== 'undefined' && success) { %>
+    <div class="alert alert-success"><%= success %></div>
+  <% } %>
   <form action="/usuarios/registro" method="POST">
     <label for="nombre">Nombre:</label>
     <input type="text" name="nombre" required><br><br>

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Usuarios</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <h1>Lista de Usuarios</h1>
+  <ul>
+    <% usuarios.forEach(usuario => { %>
+      <li>
+        <strong><%= usuario.nombre %></strong> - <%= usuario.email %>
+        <form action="/usuarios/eliminar/<%= usuario._id %>" method="POST" style="display:inline;">
+          <button type="submit">Eliminar</button>
+        </form>
+        <form action="/usuarios/editar/<%= usuario._id %>" method="POST" style="display:inline;">
+          <input type="text" name="nombre" value="<%= usuario.nombre %>" required>
+          <input type="email" name="email" value="<%= usuario.email %>" required>
+          <input type="password" name="password" placeholder="Nueva contraseña">
+          <button type="submit">Editar</button>
+        </form>
+      </li>
+    <% }); %>
+  </ul>
+  <a href="/">Volver al inicio</a>
+</body>
+</html>

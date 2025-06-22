@@ -1,24 +1,14 @@
 const express = require('express');
 const router = express.Router();
-const Reserva = require('../models/reserva');
+const reservasController = require('../controllers/reservasController');
 
-// Ruta para crear una reserva
-router.post('/', async (req, res) => {
-  try {
-    const db = client.db('canchas_padel');
-    const { cancha, usuario, fecha, hora } = req.body;
-    const nuevaReserva = new Reserva(cancha, usuario, fecha, hora);
-
-    const result = await db.collection('reservas').insertOne(nuevaReserva);
-
-    res.redirect('/reservas'); // Redirige a la página de reservas o a donde desees
-  } catch (error) {
-    console.error('Error al crear la reserva:', error);
-    res.status(500).send('Error al crear la reserva');
-  }
-});
-
-// Otras rutas para obtener, modificar o eliminar reservas si es necesario
-// ...
+// Listar reservas
+router.get('/', reservasController.listarReservas);
+// Crear reserva
+router.post('/', reservasController.crearReserva);
+// Editar reserva
+router.post('/editar/:id', reservasController.editarReserva);
+// Eliminar reserva
+router.post('/eliminar/:id', reservasController.eliminarReserva);
 
 module.exports = router;

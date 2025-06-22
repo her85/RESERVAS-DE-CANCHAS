@@ -16,16 +16,18 @@ const client = new MongoClient(uri, {
   },
 });
 
-// Función para conectar a la base de datos
+// Función para conectar a la base de datos y devolver el cliente
 async function connectToDb() {
   try {
-    await client.connect();
-    console.log("Conectado a MongoDB!");
-    // Ahora puedes realizar operaciones de MongoDB usando el objeto `client`
+    if (!client.topology || !client.topology.isConnected()) {
+      await client.connect();
+      console.log("Conectado a MongoDB!");
+    }
+    return client;
   } catch (error) {
     console.error("Error al conectar a MongoDB:", error);
+    throw error;
   }
 }
 
-// Conectamos a la base de datos
-connectToDb();
+module.exports = { client, connectToDb };

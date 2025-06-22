@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Canchas</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <h1>Listado de Canchas</h1>
+  <ul>
+    <% canchas.forEach(cancha => { %>
+      <li>
+        <strong><%= cancha.nombre %></strong> - <%= cancha.ubicacion %>
+      </li>
+    <% }); %>
+  </ul>
+  <a href="/">Volver al inicio</a>
+</body>
+</html>

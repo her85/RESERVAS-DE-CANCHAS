@@ -9,6 +9,7 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="/css/style.css" />
+    <link rel="icon" type="image/jpeg" href="/images/icono-padel.jpg" />
     <style>
       @media (max-width: 991px) {
         .navbar-nav {
@@ -42,7 +43,9 @@
               <% if (typeof userId !== 'undefined' && userId) { %>
                 <li class="nav-item"><a class="nav-link<%= (typeof currentPath !== 'undefined' && currentPath === '/canchas') ? ' active' : '' %>" href="/canchas">Canchas</a></li>
                 <li class="nav-item"><a class="nav-link<%= (typeof currentPath !== 'undefined' && currentPath === '/reservas') ? ' active' : '' %>" href="/reservas">Reservas</a></li>
-                <li class="nav-item"><a class="nav-link<%= (typeof currentPath !== 'undefined' && currentPath === '/usuarios') ? ' active' : '' %>" href="/usuarios">Usuarios</a></li>
+                <% if (typeof userRole !== 'undefined' && userRole === 'admin') { %>
+                  <li class="nav-item"><a class="nav-link<%= (typeof currentPath !== 'undefined' && currentPath === '/usuarios') ? ' active' : '' %>" href="/usuarios">Usuarios</a></li>
+                <% } %>
                 <li class="nav-item"><a class="nav-link" href="/logout">Cerrar Sesión</a></li>
               <% } %>
             </ul>

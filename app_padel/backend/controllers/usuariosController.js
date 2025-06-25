@@ -2,6 +2,7 @@
 const { client, connectToDb } = require('../database/db');
 const Usuario = require('../models/usuario');
 const bcrypt = require('bcrypt');
+const { ObjectId } = require('mongodb');
 
 module.exports = {
   // Crear usuario (registro)
@@ -51,13 +52,16 @@ module.exports = {
       await connectToDb();
       const db = client.db('canchas_padel');
       const { id } = req.params;
+      if (!ObjectId.isValid(id)) {
+        return res.status(400).send('ID de usuario inválido');
+      }
       const { nombre, email, password } = req.body;
       let updateFields = { nombre, email };
       if (password) {
         updateFields.password = await bcrypt.hash(password, 10);
       }
       await db.collection('usuarios').updateOne(
-        { _id: require('mongodb').ObjectId(id) },
+        { _id: new ObjectId(id) },
         { $set: updateFields }
       );
       res.redirect('/usuarios');
@@ -72,7 +76,10 @@ module.exports = {
       await connectToDb();
       const db = client.db('canchas_padel');
       const { id } = req.params;
-      await db.collection('usuarios').deleteOne({ _id: require('mongodb').ObjectId(id) });
+      if (!ObjectId.isValid(id)) {
+        return res.status(400).send('ID de usuario inválido');
+      }
+      await db.collection('usuarios').deleteOne({ _id: new ObjectId(id) });
       res.redirect('/usuarios');
     } catch (error) {
       console.error('Error al eliminar el usuario:', error);

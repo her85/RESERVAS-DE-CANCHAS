@@ -6,6 +6,7 @@
     <title>Mis Reservas</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="/css/style.css" />
+    <link rel="icon" type="image/jpeg" href="/images/icono-padel.jpg" />
     <style>
       @media (max-width: 991px) {
         .navbar-nav {
@@ -38,7 +39,9 @@
               <% if (typeof userId !== 'undefined' && userId) { %>
                 <li class="nav-item"><a class="nav-link<%= (typeof currentPath !== 'undefined' && currentPath === '/canchas') ? ' active' : '' %>" href="/canchas">Canchas</a></li>
                 <li class="nav-item"><a class="nav-link<%= (typeof currentPath !== 'undefined' && currentPath === '/reservas') ? ' active' : '' %>" href="/reservas">Reservas</a></li>
-                <li class="nav-item"><a class="nav-link<%= (typeof currentPath !== 'undefined' && currentPath === '/usuarios') ? ' active' : '' %>" href="/usuarios">Usuarios</a></li>
+                <% if (typeof userRole !== 'undefined' && userRole === 'admin') { %>
+                  <li class="nav-item"><a class="nav-link<%= (typeof currentPath !== 'undefined' && currentPath === '/usuarios') ? ' active' : '' %>" href="/usuarios">Usuarios</a></li>
+                <% } %>
                 <li class="nav-item"><a class="nav-link" href="/logout">Cerrar Sesión</a></li>
               <% } %>
             </ul>
@@ -58,15 +61,42 @@
               <h5><%= reserva.cancha && reserva.cancha.nombre ? reserva.cancha.nombre : reserva.cancha %></h5>
               <p>Fecha: <%= reserva.fecha %></p>
               <p>Hora: <%= reserva.hora %></p>
-              <form action="/reservas/eliminar/<%= reserva._id %>" method="POST" class="d-inline">
-                <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
-              </form>
+              <% if (typeof userRole !== 'undefined' && userRole === 'admin') { %>
+                <p>Usuario: 
+                  <% if (reserva.usuario && reserva.usuario.nombre) { %>
+                    <%= reserva.usuario.nombre %>
+                  <% } else if (reserva.usuario && reserva.usuario.email) { %>
+                    <%= reserva.usuario.email %>
+                  <% } else if (reserva.usuario) { %>
+                    <%= reserva.usuario %>
+                  <% } else { %>
+                    Usuario desconocido
+                  <% } %>
+                </p>
+              <% } %>
               <form action="/reservas/editar/<%= reserva._id %>" method="POST" class="d-inline">
-                <input type="text" name="cancha" value="<%= reserva.cancha && reserva.cancha.nombre ? reserva.cancha.nombre : reserva.cancha %>" required class="form-control d-inline w-auto mb-1">
-                <input type="text" name="usuario" value="<%= reserva.usuario %>" required class="form-control d-inline w-auto mb-1">
+                <select name="cancha" required class="form-control d-inline w-auto mb-1">
+                  <% if (typeof canchas !== 'undefined' && Array.isArray(canchas)) { %>
+                    <% canchas.forEach(c => { %>
+                      <option value="<%= c._id %>" <%= reserva.cancha && reserva.cancha._id && c._id.toString() === reserva.cancha._id.toString() ? 'selected' : '' %>><%= c.nombre %></option>
+                    <% }) %>
+                  <% } else if (reserva.cancha && reserva.cancha._id) { %>
+                    <option value="<%= reserva.cancha._id %>" selected><%= reserva.cancha.nombre %></option>
+                  <% } %>
+                </select>
+                <% if (typeof userRole !== 'undefined' && userRole === 'admin' && typeof usuarios !== 'undefined' && Array.isArray(usuarios)) { %>
+                  <select name="usuario" required class="form-control d-inline w-auto mb-1">
+                    <% usuarios.forEach(u => { %>
+                      <option value="<%= u._id %>" <%= reserva.usuario && reserva.usuario._id && u._id.toString() === reserva.usuario._id.toString() ? 'selected' : '' %>><%= u.nombre %> (<%= u.email %>)</option>
+                    <% }) %>
+                  </select>
+                <% } %>
                 <input type="date" name="fecha" value="<%= reserva.fecha %>" required class="form-control d-inline w-auto mb-1">
                 <input type="time" name="hora" value="<%= reserva.hora %>" required class="form-control d-inline w-auto mb-1">
                 <button type="submit" class="btn btn-primary btn-sm">Editar</button>
+              </form>
+              <form action="/reservas/eliminar/<%= reserva._id %>" method="POST" class="d-inline">
+                <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
               </form>
             </li>
           <% }); %>

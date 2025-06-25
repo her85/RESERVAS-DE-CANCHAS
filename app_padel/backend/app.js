@@ -71,7 +71,8 @@ function requireLogin(req, res, next) {
 function requireRole(role) {
   return function (req, res, next) {
     if (!req.session.userRole || req.session.userRole !== role) {
-      return res.status(403).send('Acceso denegado.');
+      // Si es una vista, redirigir a inicio
+      return res.redirect('/');
     }
     next();
   };
@@ -86,9 +87,13 @@ app.use('/usuarios', (req, res, next) => {
   }
   return requireLogin(req, res, next);
 });
-
-// Ejemplo: proteger rutas de administración (agregar requireRole('admin') donde corresponda)
-// app.use('/admin', requireLogin, requireRole('admin'));
+// Proteger vista de usuarios solo para admin
+app.use('/usuarios', (req, res, next) => {
+  if (req.path === '/' && req.method === 'GET') {
+    return requireRole('admin')(req, res, next);
+  }
+  next();
+});
 
 // Usar routers
 app.use('/canchas', canchasRoutes);

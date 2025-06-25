@@ -39,7 +39,26 @@ router.put('/:id',
   },
   reservasController.editarReserva
 );
+// Editar reserva (POST para formularios HTML)
+router.post('/editar/:id',
+  [
+    body('cancha').optional().trim().escape().notEmpty().withMessage('Cancha requerida'),
+    body('usuario').optional().trim().escape(),
+    body('fecha').optional().isISO8601().withMessage('Fecha inválida'),
+    body('hora').optional().matches(/^([01]\d|2[0-3]):([0-5]\d)$/).withMessage('Hora inválida')
+  ],
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).render('reserva', { reservas: [], error: errors.array().map(e => e.msg).join(', ') });
+    }
+    next();
+  },
+  reservasController.editarReserva
+);
 // Eliminar reserva (DELETE)
 router.delete('/:id', reservasController.eliminarReserva);
+// Eliminar reserva (POST para formularios HTML)
+router.post('/eliminar/:id', reservasController.eliminarReserva);
 
 module.exports = router;

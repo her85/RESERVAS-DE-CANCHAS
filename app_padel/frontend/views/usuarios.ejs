@@ -6,6 +6,7 @@
     <title>Usuarios</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="/css/style.css" />
+    <link rel="icon" type="image/jpeg" href="/images/icono-padel.jpg" />
     <style>
       @media (max-width: 991px) {
         .navbar-nav {
@@ -38,7 +39,9 @@
               <% if (typeof userId !== 'undefined' && userId) { %>
                 <li class="nav-item"><a class="nav-link<%= (typeof currentPath !== 'undefined' && currentPath === '/canchas') ? ' active' : '' %>" href="/canchas">Canchas</a></li>
                 <li class="nav-item"><a class="nav-link<%= (typeof currentPath !== 'undefined' && currentPath === '/reservas') ? ' active' : '' %>" href="/reservas">Reservas</a></li>
-                <li class="nav-item"><a class="nav-link<%= (typeof currentPath !== 'undefined' && currentPath === '/usuarios') ? ' active' : '' %>" href="/usuarios">Usuarios</a></li>
+                <% if (typeof userRole !== 'undefined' && userRole === 'admin') { %>
+                  <li class="nav-item"><a class="nav-link<%= (typeof currentPath !== 'undefined' && currentPath === '/usuarios') ? ' active' : '' %>" href="/usuarios">Usuarios</a></li>
+                <% } %>
                 <li class="nav-item"><a class="nav-link" href="/logout">Cerrar Sesión</a></li>
               <% } %>
             </ul>
@@ -53,14 +56,14 @@
           <% usuarios.forEach(usuario => { %>
             <li class="list-group-item">
               <strong><%= usuario.nombre %></strong> - <%= usuario.email %>
-              <form action="/usuarios/eliminar/<%= usuario._id %>" method="POST" class="d-inline">
-                <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
-              </form>
               <form action="/usuarios/editar/<%= usuario._id %>" method="POST" class="d-inline">
                 <input type="text" name="nombre" value="<%= usuario.nombre %>" required class="form-control d-inline w-auto mb-1">
                 <input type="email" name="email" value="<%= usuario.email %>" required class="form-control d-inline w-auto mb-1">
                 <input type="password" name="password" placeholder="Nueva contraseña" class="form-control d-inline w-auto mb-1">
                 <button type="submit" class="btn btn-primary btn-sm">Editar</button>
+              </form>
+               <form action="/usuarios/eliminar/<%= usuario._id %>" method="POST" class="d-inline">
+                <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
               </form>
             </li>
           <% }); %>

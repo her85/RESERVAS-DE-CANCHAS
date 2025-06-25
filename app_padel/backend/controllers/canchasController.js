@@ -1,5 +1,6 @@
 // Controlador para canchas
 const { client, connectToDb } = require('../database/db');
+const { ObjectId } = require('mongodb');
 
 module.exports = {
   listarCanchas: async (req, res) => {
@@ -19,12 +20,13 @@ module.exports = {
     try {
       await connectToDb();
       const db = client.db('canchas_padel');
-      const cancha = await db.collection('canchas').findOne({ _id: require('mongodb').ObjectId(req.params.id) });
+      const cancha = await db.collection('canchas').findOne({ _id: new ObjectId(req.params.id) });
       if (!cancha) {
         return res.status(404).render('cancha', { cancha: null, error: 'Cancha no encontrada' });
       }
       res.render('cancha', { cancha, error: null });
     } catch (error) {
+      console.error('Error detalleCancha:', error); // <--- asegúrate de tener esto
       const errorMsg = error.message.includes('No se pudo conectar a la base de datos')
         ? error.message
         : 'Error al obtener la cancha';

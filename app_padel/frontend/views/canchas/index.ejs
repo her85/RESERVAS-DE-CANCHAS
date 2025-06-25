@@ -61,7 +61,9 @@
         <ul class="list-group mb-4">
           <% canchas.forEach(cancha => { %>
             <li class="list-group-item">
-              <strong><%= cancha.nombre %></strong> - <%= cancha.ubicacion %>
+              <a href="/canchas/<%= cancha._id %>">
+                <strong><%= cancha.nombre %></strong> - <%= cancha.ubicacion %>
+              </a>
             </li>
           <% }); %>
         </ul>

@@ -8,7 +8,7 @@ module.exports = {
   crearUsuario: async (req, res) => {
     try {
       await connectToDb();
-      const db = client.db('padel');
+      const db = client.db('canchas_padel');
       const { nombre, email, password } = req.body;
       // Validación básica
       if (!nombre || !email || !password) {
@@ -21,12 +21,16 @@ module.exports = {
       }
       // Encripta la contraseña
       const hashedPassword = await bcrypt.hash(password, 10);
-      const nuevoUsuario = new Usuario(nombre, email, hashedPassword);
+      // Permitir asignar rol solo si el usuario autenticado es admin (para pruebas, por ahora solo usuario normal)
+      const rol = req.body.rol && req.session.userRole === 'admin' ? req.body.rol : 'usuario';
+      const nuevoUsuario = new Usuario(nombre, email, hashedPassword, rol);
       await db.collection('usuarios').insertOne(nuevoUsuario);
       return res.render('registro', { error: null, success: 'Usuario registrado correctamente. Ahora puedes iniciar sesión.' });
     } catch (error) {
-      console.error('Error al registrar el usuario:', error);
-      return res.render('registro', { error: 'Error al registrar el usuario', success: null });
+      const errorMsg = error.message.includes('No se pudo conectar a la base de datos')
+        ? error.message
+        : 'Error al registrar el usuario';
+      return res.render('registro', { error: errorMsg, success: null });
     }
   },
   // Listar usuarios
@@ -94,10 +98,13 @@ module.exports = {
       }
       req.session.userId = usuario._id;
       req.session.userName = usuario.nombre;
-      return res.render('login', { error: null, success: 'Inicio de sesión exitoso.' });
+      req.session.userRole = usuario.rol || 'usuario';
+      return res.redirect('/canchas');
     } catch (error) {
-      console.error('Error al iniciar sesión:', error);
-      return res.render('login', { error: 'Error al iniciar sesión', success: null });
+      const errorMsg = error.message.includes('No se pudo conectar a la base de datos')
+        ? error.message
+        : 'Error al iniciar sesión';
+      return res.render('login', { error: errorMsg, success: null });
     }
   }
 };

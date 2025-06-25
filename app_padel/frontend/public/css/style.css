@@ -32,8 +32,15 @@ main {
   text-decoration: none; /* Quita el subrayado de los enlaces */
 }
 
+.nav-link.active, .nav-link:focus {
+  text-decoration: underline;
+  color: #d4eaff !important;
+}
+
 footer {
   background-color: #f8f9fa; /* Color de fondo para el footer */
   padding: 10px 0;
   text-align: center;
 }
+
+

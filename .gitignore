@@ -1,4 +1,40 @@
+# Archivos y carpetas de entorno y dependencias
 .env
-FaltaHacer.txt
-node_modules
+.env.*
+node_modules/
 package-lock.json
+yarn.lock
+npm-debug.log*
+.DS_Store
+*.log
+
+# Archivos temporales y del sistema
+*.tmp
+*.swp
+*.swo
+*.bak
+*.old
+
+# Salidas de pruebas y cobertura
+coverage/
+*.lcov
+
+# Archivos de VSCode y otros editores
+.vscode/
+.idea/
+*.code-workspace
+
+# Archivos de sistema operativo
+Thumbs.db
+Desktop.ini
+
+# Archivos de scripts de carga de datos
+crearAdmin.js
+crearCanchas.js
+
+# Documentos personales o de tareas
+FaltaHacer.txt
+
+# Otros archivos que no deben subirse
+*.sqlite
+*.db

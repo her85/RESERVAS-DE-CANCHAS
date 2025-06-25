@@ -2,15 +2,42 @@ const express = require('express');
 const bodyParser = require('body-parser'); //Middleware
 const path = require("path");
 const session = require('express-session');
+// const csurf = require('csurf');
+// const helmet = require('helmet');
 const app = express();
+
+// Seguridad HTTP headers
+// app.use(helmet({
+//   contentSecurityPolicy: {
+//     directives: {
+//       defaultSrc: ["'self'"],
+//       scriptSrc: ["'self'", "https://cdn.jsdelivr.net", "'unsafe-inline'"],
+//       styleSrc: ["'self'", "https://cdn.jsdelivr.net", "'unsafe-inline'"],
+//       imgSrc: ["'self'", "data:", "https://cdn.jsdelivr.net"],
+//       connectSrc: ["'self'"],
+//       fontSrc: ["'self'", "https://cdn.jsdelivr.net"],
+//       objectSrc: ["'none'"],
+//       upgradeInsecureRequests: [],
+//     },
+//   },
+// }));
 
 // Configuración de sesiones
 app.use(session({
   secret: process.env.SESSION_SECRET || 'padel_secret',
   resave: false,
   saveUninitialized: false,
-  cookie: { secure: false, maxAge: 24 * 60 * 60 * 1000 } // 1 día
+  cookie: { secure: false } // Sesión expira al cerrar el navegador
 }));
+
+// Protección CSRF
+// app.use(csurf());
+// app.use((req, res, next) => {
+//   res.locals.csrfToken = req.csrfToken();
+//   res.locals.userId = req.session.userId;
+//   res.locals.userRole = req.session.userRole;
+//   next();
+// });
 
 // Configuramos el servidor para usar archivos estáticos
 app.use(express.static(path.join(__dirname, "../frontend/public")));
@@ -19,14 +46,18 @@ app.use(bodyParser.urlencoded({ extended: true }));  // Habilita el análisis de
 app.set('view engine', 'ejs');
 app.set("views", path.join(__dirname, "../frontend/views"));
 
+// Middleware para pasar variables globales a todas las vistas
+app.use((req, res, next) => {
+  res.locals.userId = req.session.userId;
+  res.locals.userRole = req.session.userRole;
+  res.locals.currentPath = req.path;
+  next();
+});
+
 // Rutas
 const canchasRoutes = require('./routes/canchas');
 const reservasRoutes = require('./routes/reservas');
 const usuariosRoutes = require('./routes/usuarios');
-
-app.use('/canchas', canchasRoutes);
-app.use('/reservas', reservasRoutes);
-app.use('/usuarios', usuariosRoutes);
 
 // Middleware para proteger rutas sensibles
 function requireLogin(req, res, next) {
@@ -36,30 +67,60 @@ function requireLogin(req, res, next) {
   next();
 }
 
-// Proteger rutas de reservas y usuarios
-app.use('/reservas', requireLogin);
-app.use('/usuarios', requireLogin);
+// Middleware para roles
+function requireRole(role) {
+  return function (req, res, next) {
+    if (!req.session.userRole || req.session.userRole !== role) {
+      return res.status(403).send('Acceso denegado.');
+    }
+    next();
+  };
+}
 
+// Proteger rutas de reservas y usuarios (solo autenticados)
+app.use('/reservas', requireLogin);
+// Solo proteger /usuarios excepto login y registro
+app.use('/usuarios', (req, res, next) => {
+  if (req.path === '/login' || req.path === '/registro') {
+    return next();
+  }
+  return requireLogin(req, res, next);
+});
+
+// Ejemplo: proteger rutas de administración (agregar requireRole('admin') donde corresponda)
+// app.use('/admin', requireLogin, requireRole('admin'));
+
+// Usar routers
+app.use('/canchas', canchasRoutes);
+app.use('/reservas', reservasRoutes);
+app.use('/usuarios', usuariosRoutes);
+
+// Rutas públicas
 app.get('/', (req, res) => {
   res.render('index');
 });
-
-// Mantén accesibles las rutas de registro y login
 app.get('/usuarios/login', (req, res) => {
   res.render('login');
 });
 app.get('/usuarios/registro', (req, res) => {
   res.render('registro');
 });
-// Renderizar listado de reservas
-app.get('/reservas', (req, res, next) => {
-  // Delega en el controlador de reservas (ya implementado en la ruta)
-  require('./routes/reservas')(req, res, next);
+app.get('/logout', (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      return res.status(500).send('Error al cerrar sesión');
+    }
+    res.redirect('/usuarios/login');
+  });
 });
-// Renderizar listado de usuarios
-app.get('/usuarios', (req, res, next) => {
-  require('./routes/usuarios')(req, res, next);
-});
+
+// Manejo de errores CSRF
+// app.use((err, req, res, next) => {
+//   if (err.code === 'EBADCSRFTOKEN') {
+//     return res.status(403).render('login', { error: 'Sesión expirada o token CSRF inválido. Por favor, recarga la página e intenta de nuevo.', success: null });
+//   }
+//   next(err);
+// });
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Servidor iniciado en el puerto http://localhost:${PORT}`));

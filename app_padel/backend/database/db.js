@@ -1,7 +1,7 @@
 require('dotenv').config();
 
 const { MongoClient, ServerApiVersion } = require("mongodb");
-const { MONGODB_USR, MONGODB_PWD } =  require("./config");
+const { MONGODB_USR, MONGODB_PWD } =  require("../config/config");
 
 // Conexión a MongoDB utilizando variables de entorno
 const uri =
@@ -26,7 +26,9 @@ async function connectToDb() {
     return client;
   } catch (error) {
     console.error("Error al conectar a MongoDB:", error);
-    throw error;
+    // Mejor feedback para el resto de la app
+    // Lanzar el error para que los controladores puedan mostrar feedback visual
+    throw new Error("No se pudo conectar a la base de datos. Verifica la configuración y el estado de MongoDB.");
   }
 }
 

@@ -9,12 +9,16 @@ module.exports = {
       await connectToDb();
       const db = client.db('canchas_padel');
       const { cancha, usuario, fecha, hora } = req.body;
-      const nuevaReserva = new Reserva(cancha, usuario, fecha, hora);
+      // Si el usuario está autenticado, usar su id de sesión
+      const usuarioId = req.session && req.session.userId ? req.session.userId : usuario;
+      const nuevaReserva = new Reserva(cancha, usuarioId, fecha, hora);
       await db.collection('reservas').insertOne(nuevaReserva);
       res.redirect('/reservas');
     } catch (error) {
-      console.error('Error al crear la reserva:', error);
-      res.status(500).send('Error al crear la reserva');
+      const errorMsg = error.message.includes('No se pudo conectar a la base de datos')
+        ? error.message
+        : 'Error al crear la reserva';
+      res.status(500).render('reserva', { reservas: [], error: errorMsg });
     }
   },
   // Listar reservas
@@ -25,8 +29,10 @@ module.exports = {
       const reservas = await db.collection('reservas').find().toArray();
       res.render('reserva', { reservas });
     } catch (error) {
-      console.error('Error al obtener reservas:', error);
-      res.status(500).send('Error al obtener reservas');
+      const errorMsg = error.message.includes('No se pudo conectar a la base de datos')
+        ? error.message
+        : 'Error al obtener reservas';
+      res.status(500).render('reserva', { reservas: [], error: errorMsg });
     }
   },
   // Editar reserva

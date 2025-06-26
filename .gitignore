@@ -31,9 +31,11 @@ Desktop.ini
 # Archivos de scripts de carga de datos
 crearAdmin.js
 crearCanchas.js
+migrarUsuariosResrvas.js
 
 # Documentos personales o de tareas
 FaltaHacer.txt
+RECOMENDACIONES_PROYECTO.txt
 
 # Otros archivos que no deben subirse
 *.sqlite

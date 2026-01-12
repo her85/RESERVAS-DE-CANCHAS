@@ -25,7 +25,7 @@ async function seedAdmin() {
 
     const email = process.env.ADMIN_EMAIL || 'admin@local.dev';
     const nombre = process.env.ADMIN_NAME || 'Administrador';
-    const plainPassword = process.env.ADMIN_PASSWORD || 'Admin123!';
+    const plainPassword = process.env.ADMIN_PASSWORD || 'Admin123!4544';
 
     const existing = await db.collection('usuarios').findOne({ email });
     const hashed = await bcrypt.hash(plainPassword, 10);

@@ -34,7 +34,7 @@ module.exports = {
         // Obtener canchas y usuarios para renderizar la vista con datos
         const canchas = await db.collection('canchas').find().toArray();
         const usuarios = req.session.userRole === 'admin' ? await db.collection('usuarios').find({}, { projection: { password: 0 } }).toArray() : [];
-        return res.status(400).render('reserva', { reservas: [], canchas, usuarios, error: 'La reserva no puede ser anterior a la fecha y hora actual.' });
+        return res.status(400).render('reserva', { reservas: [], canchas, usuarios, error: 'La reserva no puede ser anterior a la fecha y hora actual.', backTo: '/canchas' });
       }
       // Validar disponibilidad: comprobar solapamientos considerando duracion (1 o 2 horas)
       const existentes = await db.collection('reservas').find({ cancha: canchaId, fecha }).toArray();
@@ -47,7 +47,7 @@ module.exports = {
         if (startHour < exEnd && exStart < endHour) {
           const canchas = await db.collection('canchas').find().toArray();
           const usuarios = req.session.userRole === 'admin' ? await db.collection('usuarios').find({}, { projection: { password: 0 } }).toArray() : [];
-          return res.status(400).render('reserva', { reservas: [], canchas, usuarios, error: 'La cancha ya está reservada en ese rango horario.' });
+          return res.status(400).render('reserva', { reservas: [], canchas, usuarios, error: 'La cancha ya está reservada en ese rango horario.', backTo: '/canchas' });
         }
       }
 

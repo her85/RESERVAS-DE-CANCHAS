@@ -83,6 +83,49 @@ footer {
   z-index: 1060; /* encima de la mayoría, debajo del spinner */
   max-width: calc(100% - 2rem);
 }
+
+/* Centrar mensajes en pantalla (overlay) cuando se quiere destacar y redirigir) */
+.messages-container.messages-centered {
+  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+.messages-container.messages-centered .message {
+  max-width: 720px;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.25rem;
+}
+.message-back {
+  margin-right: 0.5rem;
+  color: #fff;
+  text-decoration: none;
+  padding: 0.45rem 0.75rem;
+  border-radius: 6px;
+  background: transparent;
+  border: 1px solid #fff;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.message .countdown {
+  display: inline-block;
+  min-width: 26px;
+  text-align: center;
+  background: rgba(255,255,255,0.12);
+  color: #fff;
+  padding: 0.12rem 0.35rem;
+  border-radius: 4px;
+  font-weight: 700;
+}
 .message {
   display: flex;
   align-items: center;

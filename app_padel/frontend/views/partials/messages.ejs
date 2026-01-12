@@ -1,8 +1,11 @@
 <!-- Messages container partial: muestra mensajes tipo success/error/info y permite cerrarlos -->
-<div id="messages-container" class="messages-container" aria-live="polite" aria-atomic="true">
+<div id="messages-container" class="messages-container<%= (typeof backTo !== 'undefined' && backTo) ? ' messages-centered' : '' %>" aria-live="polite" aria-atomic="true">
   <% if (typeof error !== 'undefined' && error) { %>
-    <div class="message message-error" role="alert">
+    <div class="message message-error" role="alert" <% if (typeof backTo !== 'undefined' && backTo) { %> data-back-to="<%= backTo %>" <% } %> >
       <span class="message-body"><%= error %></span>
+      <% if (typeof backTo !== 'undefined' && backTo) { %>
+        <a href="<%= backTo %>" class="message-back">Volver a canchas <span class="countdown">10</span>s</a>
+      <% } %>
       <button class="message-close" aria-label="Cerrar mensaje">&times;</button>
     </div>
   <% } %>

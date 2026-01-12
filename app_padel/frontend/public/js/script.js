@@ -60,6 +60,17 @@ function createMessage(text, type = 'info', options = {}) {
 
 function removeMessage(msg) {
 	if (!msg) return;
+	// cancelar redirección programada si existe
+	try {
+		if (msg.__redirectTimer) {
+			clearTimeout(msg.__redirectTimer);
+			msg.__redirectTimer = null;
+		}
+		if (msg.__redirectInterval) {
+			clearInterval(msg.__redirectInterval);
+			msg.__redirectInterval = null;
+		}
+	} catch (e) {}
 	msg.style.transition = 'opacity 200ms ease, transform 200ms ease';
 	msg.style.opacity = '0';
 	msg.style.transform = 'translateY(-6px)';
@@ -75,5 +86,38 @@ document.addEventListener('DOMContentLoaded', () => {
 			const msg = e.target.closest('.message');
 			removeMessage(msg);
 		});
+	});
+	// Si hay botones 'Volver' renderizados por el servidor, no hacemos nada extra;
+	// el enlace ya navegará a /canchas. Podemos añadir un handler para confirmación si se desea.
+	container.querySelectorAll('.message-back').forEach(btn => {
+		btn.addEventListener('click', (e) => {
+			// dejar que el enlace funcione; opcional: cerrar mensaje antes de navegar
+			const msg = e.target.closest('.message');
+			removeMessage(msg);
+			// navegación por defecto del <a> seguirá
+		});
+	});
+
+	// Si hay mensajes con data-back-to, programar redirección automática con cuenta regresiva
+	container.querySelectorAll('.message[data-back-to]').forEach(msg => {
+		const back = msg.getAttribute('data-back-to');
+		if (!back) return;
+		const seconds = 10;
+		let remaining = seconds;
+		const countdownEl = msg.querySelector('.countdown');
+		if (countdownEl) countdownEl.textContent = String(remaining);
+		try {
+			msg.__redirectInterval = setInterval(() => {
+				remaining -= 1;
+				if (countdownEl) countdownEl.textContent = String(remaining);
+				if (remaining <= 0) {
+					clearInterval(msg.__redirectInterval);
+					msg.__redirectInterval = null;
+				}
+			}, 1000);
+			msg.__redirectTimer = setTimeout(() => {
+				window.location.href = back;
+			}, seconds * 1000);
+		} catch (e) { }
 	});
 });

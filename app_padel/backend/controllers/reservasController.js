@@ -16,6 +16,27 @@ module.exports = {
       usuarioId = ObjectId.isValid(usuarioId) ? new ObjectId(usuarioId) : usuarioId;
       // Guardar el ObjectId de la cancha
       const canchaId = ObjectId.isValid(cancha) ? new ObjectId(cancha) : cancha;
+      // Validar que la fecha+hora no sea menor a ahora
+      const reservaDate = new Date(`${fecha}T${hora}:00`);
+      const now = new Date();
+      if (isNaN(reservaDate.getTime())) {
+        throw new Error('Fecha u hora inválida');
+      }
+      if (reservaDate < now) {
+        // Obtener canchas y usuarios para renderizar la vista con datos
+        const canchas = await db.collection('canchas').find().toArray();
+        const usuarios = req.session.userRole === 'admin' ? await db.collection('usuarios').find({}, { projection: { password: 0 } }).toArray() : [];
+        return res.status(400).render('reserva', { reservas: [], canchas, usuarios, error: 'La reserva no puede ser anterior a la fecha y hora actual.' });
+      }
+
+      // Validar que la cancha no esté ocupada en la misma fecha y hora
+      const existente = await db.collection('reservas').findOne({ cancha: canchaId, fecha, hora });
+      if (existente) {
+        const canchas = await db.collection('canchas').find().toArray();
+        const usuarios = req.session.userRole === 'admin' ? await db.collection('usuarios').find({}, { projection: { password: 0 } }).toArray() : [];
+        return res.status(400).render('reserva', { reservas: [], canchas, usuarios, error: 'La cancha ya está reservada en esa fecha y hora.' });
+      }
+
       const reservaObj = new Reserva({ cancha: canchaId, usuario: usuarioId, fecha, hora });
       await db.collection('reservas').insertOne(reservaObj);
       res.redirect('/reservas');
@@ -106,6 +127,17 @@ module.exports = {
       const { cancha, usuario, fecha, hora } = req.body;
       // Guardar el ObjectId de la cancha
       const canchaId = ObjectId.isValid(cancha) ? new ObjectId(cancha) : cancha;
+      // Validar que la fecha+hora no sea menor a ahora (si se proporciona)
+      if (fecha && hora) {
+        const reservaDate = new Date(`${fecha}T${hora}:00`);
+        const now = new Date();
+        if (isNaN(reservaDate.getTime())) {
+          return res.status(400).send('Fecha u hora inválida');
+        }
+        if (reservaDate < now) {
+          return res.status(400).send('La reserva no puede ser anterior a la fecha y hora actual.');
+        }
+      }
       // Si el usuario no es admin, forzar el usuario de la sesión
       let usuarioId = usuario;
       if (req.session.userRole !== 'admin') {
@@ -113,6 +145,18 @@ module.exports = {
       }
       // Asegurar que usuarioId sea ObjectId si es válido
       const usuarioObjId = ObjectId.isValid(usuarioId) ? new ObjectId(usuarioId) : usuarioId;
+      // Validar que la cancha no esté ocupada en la misma fecha y hora (excluyendo la propia reserva)
+      if (fecha && hora) {
+        const conflict = await db.collection('reservas').findOne({
+          cancha: canchaId,
+          fecha,
+          hora,
+          _id: { $ne: new ObjectId(id) }
+        });
+        if (conflict) {
+          return res.status(400).send('La cancha ya está reservada en esa fecha y hora.');
+        }
+      }
       await db.collection('reservas').updateOne(
         { _id: new ObjectId(id) },
         { $set: { cancha: canchaId, usuario: usuarioObjId, fecha, hora } }

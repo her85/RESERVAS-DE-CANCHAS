@@ -1,0 +1,15 @@
+<!-- Messages container partial: muestra mensajes tipo success/error/info y permite cerrarlos -->
+<div id="messages-container" class="messages-container" aria-live="polite" aria-atomic="true">
+  <% if (typeof error !== 'undefined' && error) { %>
+    <div class="message message-error" role="alert">
+      <span class="message-body"><%= error %></span>
+      <button class="message-close" aria-label="Cerrar mensaje">&times;</button>
+    </div>
+  <% } %>
+  <% if (typeof success !== 'undefined' && success) { %>
+    <div class="message message-success" role="status">
+      <span class="message-body"><%= success %></span>
+      <button class="message-close" aria-label="Cerrar mensaje">&times;</button>
+    </div>
+  <% } %>
+</div>

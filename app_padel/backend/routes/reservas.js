@@ -12,7 +12,8 @@ router.post('/',
     body('cancha').trim().escape().notEmpty().withMessage('Cancha requerida'),
     body('usuario').optional().trim().escape(),
     body('fecha').isISO8601().withMessage('Fecha inválida'),
-    body('hora').matches(/^([01]\d|2[0-3]):([0-5]\d)$/).withMessage('Hora inválida'),
+    body('hora').matches(/^([01]\d|2[0-3]):00$/).withMessage('Hora inválida - solo en punto (ej. 14:00)'),
+    body('duracion').optional().isIn(['1','2']).withMessage('Duración inválida'),
     // Fecha+hora no pueden ser en el pasado
     body('fecha').custom((fecha, { req }) => {
       const hora = req.body.hora;
@@ -22,17 +23,7 @@ router.post('/',
       if (reservaDate < new Date()) throw new Error('La reserva no puede ser anterior a la fecha y hora actual');
       return true;
     }),
-    // Validar que la cancha no esté ocupada en la misma fecha y hora
-    body('cancha').custom(async (cancha, { req }) => {
-      const { fecha, hora } = req.body;
-      if (!fecha || !hora) return true;
-      await connectToDb();
-      const db = client.db('canchas_padel');
-      const canchaId = require('mongodb').ObjectId.isValid(cancha) ? new (require('mongodb').ObjectId)(cancha) : cancha;
-      const existente = await db.collection('reservas').findOne({ cancha: canchaId, fecha, hora });
-      if (existente) throw new Error('La cancha ya está reservada en esa fecha y hora');
-      return true;
-    })
+    // Disponibilidad: comprobada en el controlador considerando duración
   ],
   (req, res, next) => {
     const errors = validationResult(req);
@@ -49,7 +40,8 @@ router.put('/:id',
     body('cancha').optional().trim().escape().notEmpty().withMessage('Cancha requerida'),
     body('usuario').optional().trim().escape(),
     body('fecha').optional().isISO8601().withMessage('Fecha inválida'),
-    body('hora').optional().matches(/^([01]\d|2[0-3]):([0-5]\d)$/).withMessage('Hora inválida')
+    body('hora').optional().matches(/^([01]\d|2[0-3]):00$/).withMessage('Hora inválida - solo en punto (ej. 14:00)'),
+    body('duracion').optional().isIn(['1','2']).withMessage('Duración inválida')
   ],
   (req, res, next) => {
     const errors = validationResult(req);
@@ -66,7 +58,8 @@ router.post('/editar/:id',
     body('cancha').optional().trim().escape().notEmpty().withMessage('Cancha requerida'),
     body('usuario').optional().trim().escape(),
     body('fecha').optional().isISO8601().withMessage('Fecha inválida'),
-    body('hora').optional().matches(/^([01]\d|2[0-3]):([0-5]\d)$/).withMessage('Hora inválida'),
+    body('hora').optional().matches(/^([01]\d|2[0-3]):00$/).withMessage('Hora inválida - solo en punto (ej. 14:00)'),
+    body('duracion').optional().isIn(['1','2']).withMessage('Duración inválida'),
     // Si se proporciona fecha y hora, no pueden ser pasado
     body('fecha').custom((fecha, { req }) => {
       const hora = req.body.hora;
@@ -76,19 +69,7 @@ router.post('/editar/:id',
       if (reservaDate < new Date()) throw new Error('La reserva no puede ser anterior a la fecha y hora actual');
       return true;
     }),
-    // Validar disponibilidad excluyendo la reserva actual
-    body('cancha').custom(async (cancha, { req }) => {
-      const { fecha, hora } = req.body;
-      const id = req.params.id;
-      if (!fecha || !hora) return true;
-      await connectToDb();
-      const db = client.db('canchas_padel');
-      const ObjectId = require('mongodb').ObjectId;
-      const canchaId = ObjectId.isValid(cancha) ? new ObjectId(cancha) : cancha;
-      const conflict = await db.collection('reservas').findOne({ cancha: canchaId, fecha, hora, _id: { $ne: new ObjectId(id) } });
-      if (conflict) throw new Error('La cancha ya está reservada en esa fecha y hora');
-      return true;
-    })
+    // Disponibilidad: comprobada en el controlador considerando duración
   ],
   (req, res, next) => {
     const errors = validationResult(req);

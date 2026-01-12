@@ -23,7 +23,11 @@
     </style>
   </head>
 
-  <body class="container-lg">
+  <body class="container-lg no-scroll">
+    <!-- Spinner overlay: visible hasta que la página termine de cargar -->
+    <div id="spinner-overlay" aria-hidden="false" class="spinner-overlay">
+      <div class="spinner" role="status" aria-label="Cargando"></div>
+    </div>
     <header>
       <nav class="navbar navbar-expand-lg">
         <div class="container-fluid">

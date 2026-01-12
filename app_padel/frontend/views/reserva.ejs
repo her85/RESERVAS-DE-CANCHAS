@@ -105,9 +105,7 @@
                   <option value="1" <%= (reserva.duracion ? parseInt(reserva.duracion) : 1) === 1 ? 'selected' : '' %>>1 hora</option>
                   <option value="2" <%= (reserva.duracion ? parseInt(reserva.duracion) : 1) === 2 ? 'selected' : '' %>>2 horas</option>
                 </select>
-                <% if (typeof userRole !== 'undefined' && userRole === 'admin') { %>
-                <button type="submit" class="btn btn-primary btn-sm">Editar</button>
-                <% } %>
+                <button type="submit" class="btn btn-primary btn-sm">Actualizar</button>
               </form>
               <% if (typeof userRole !== 'undefined' && userRole === 'admin') { %>
               <form action="/reservas/eliminar/<%= reserva._id %>" method="POST" class="d-inline">

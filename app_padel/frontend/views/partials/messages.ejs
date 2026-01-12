@@ -4,7 +4,13 @@
     <div class="message message-error" role="alert" <% if (typeof backTo !== 'undefined' && backTo) { %> data-back-to="<%= backTo %>" <% } %> >
       <span class="message-body"><%= error %></span>
       <% if (typeof backTo !== 'undefined' && backTo) { %>
-        <a href="<%= backTo %>" class="message-back">Volver a canchas <span class="countdown">10</span>s</a>
+        <% if (backTo === '/reservas') { %>
+          <a href="<%= backTo %>" class="message-back">Volver a reservas <span class="countdown">10</span>s</a>
+        <% } else if (backTo === '/canchas') { %>
+          <a href="<%= backTo %>" class="message-back">Volver a canchas <span class="countdown">10</span>s</a>
+        <% } else { %>
+          <a href="<%= backTo %>" class="message-back">Volver <span class="countdown">10</span>s</a>
+        <% } %>
       <% } %>
       <button class="message-close" aria-label="Cerrar mensaje">&times;</button>
     </div>

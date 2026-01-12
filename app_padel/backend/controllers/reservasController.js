@@ -141,21 +141,42 @@ module.exports = {
       const { cancha, usuario, fecha, hora, duracion } = req.body;
       // Guardar el ObjectId de la cancha
       const canchaId = ObjectId.isValid(cancha) ? new ObjectId(cancha) : cancha;
+      const isForm = req.method === 'POST' || (req.headers['content-type'] && req.headers['content-type'].includes('application/x-www-form-urlencoded'));
       // Validar que la fecha+hora no sea menor a ahora (si se proporciona)
       if (fecha && hora) {
         if (!/^([01]\d|2[0-3]):00$/.test(hora)) {
+          if (isForm) {
+            const canchas = await db.collection('canchas').find().toArray();
+            const usuarios = req.session.userRole === 'admin' ? await db.collection('usuarios').find({}, { projection: { password: 0 } }).toArray() : [];
+            return res.status(400).render('reserva', { reservas: [], canchas, usuarios, error: 'Solo se permiten reservas en horas redondas (ej. 14:00)', backTo: '/reservas' });
+          }
           return res.status(400).send('Solo se permiten reservas en horas redondas (ej. 14:00)');
         }
         const dur = parseInt(duracion) || 1;
         if (![1, 2].includes(dur)) {
+          if (isForm) {
+            const canchas = await db.collection('canchas').find().toArray();
+            const usuarios = req.session.userRole === 'admin' ? await db.collection('usuarios').find({}, { projection: { password: 0 } }).toArray() : [];
+            return res.status(400).render('reserva', { reservas: [], canchas, usuarios, error: 'Duración inválida', backTo: '/reservas' });
+          }
           return res.status(400).send('Duración inválida');
         }
         const reservaDate = new Date(`${fecha}T${hora}:00`);
         const now = new Date();
         if (isNaN(reservaDate.getTime())) {
+          if (isForm) {
+            const canchas = await db.collection('canchas').find().toArray();
+            const usuarios = req.session.userRole === 'admin' ? await db.collection('usuarios').find({}, { projection: { password: 0 } }).toArray() : [];
+            return res.status(400).render('reserva', { reservas: [], canchas, usuarios, error: 'Fecha u hora inválida', backTo: '/reservas' });
+          }
           return res.status(400).send('Fecha u hora inválida');
         }
         if (reservaDate < now) {
+          if (isForm) {
+            const canchas = await db.collection('canchas').find().toArray();
+            const usuarios = req.session.userRole === 'admin' ? await db.collection('usuarios').find({}, { projection: { password: 0 } }).toArray() : [];
+            return res.status(400).render('reserva', { reservas: [], canchas, usuarios, error: 'La reserva no puede ser anterior a la fecha y hora actual.', backTo: '/reservas' });
+          }
           return res.status(400).send('La reserva no puede ser anterior a la fecha y hora actual.');
         }
       }
@@ -177,18 +198,56 @@ module.exports = {
           const exDur = ex.duracion ? parseInt(ex.duracion) : 1;
           const exEnd = exStart + exDur;
           if (startHour < exEnd && exStart < endHour) {
-            return res.status(400).send('La cancha ya está reservada en ese rango horario.');
-          }
+              if (isForm) {
+                const canchas = await db.collection('canchas').find().toArray();
+                const usuarios = req.session.userRole === 'admin' ? await db.collection('usuarios').find({}, { projection: { password: 0 } }).toArray() : [];
+                return res.status(400).render('reserva', { reservas: [], canchas, usuarios, error: 'La cancha ya está reservada en ese rango horario.', backTo: '/reservas' });
+              }
+              return res.status(400).send('La cancha ya está reservada en ese rango horario.');
+            }
         }
       }
-      await db.collection('reservas').updateOne(
-        { _id: new ObjectId(id) },
-        { $set: { cancha: canchaId, usuario: usuarioObjId, fecha, hora, duracion: parseInt(duracion) || 1 } }
-      );
-      res.redirect('/reservas');
+        await db.collection('reservas').updateOne(
+          { _id: new ObjectId(id) },
+          { $set: { cancha: canchaId, usuario: usuarioObjId, fecha, hora, duracion: parseInt(duracion) || 1 } }
+        );
+        // Si el formulario viene del HTML, mostrar mensaje centrado y redirigir tras unos segundos
+        if (isForm) {
+          // obtener listas y reservas para renderizar
+          const canchas = await db.collection('canchas').find().toArray();
+          const usuarios = (typeof req.session.userRole !== 'undefined' && req.session.userRole === 'admin') ? await db.collection('usuarios').find({}, { projection: { password: 0 } }).toArray() : [];
+          // obtener reservas (mismo pipeline que en listarReservas)
+          let match = {};
+          if (!(typeof req.session.userRole !== 'undefined' && req.session.userRole === 'admin')) {
+            const userId = ObjectId.isValid(req.session.userId) ? new ObjectId(req.session.userId) : req.session.userId;
+            match = { usuario: userId };
+          }
+          const reservas = await db.collection('reservas').aggregate([
+            { $match: match },
+            { $lookup: { from: 'canchas', localField: 'cancha', foreignField: '_id', as: 'canchaObj' } },
+            { $unwind: { path: '$canchaObj', preserveNullAndEmptyArrays: true } },
+            { $lookup: { from: 'usuarios', localField: 'usuario', foreignField: '_id', as: 'usuarioObj' } },
+            { $unwind: { path: '$usuarioObj', preserveNullAndEmptyArrays: true } },
+            { $addFields: { cancha: '$canchaObj', usuario: '$usuarioObj' } },
+            { $project: { canchaObj: 0, usuarioObj: 0, 'usuario.password': 0 } }
+          ]).toArray();
+          return res.render('reserva', { reservas, canchas, usuarios, success: 'Reserva actualizada correctamente.', backTo: '/reservas' });
+        }
+        return res.redirect('/reservas');
     } catch (error) {
       console.error('Error al editar la reserva:', error);
-      res.status(500).send('Error al editar la reserva');
+        if (req.method === 'POST') {
+          try {
+            await connectToDb();
+            const db = client.db('canchas_padel');
+            const canchas = await db.collection('canchas').find().toArray();
+            const usuarios = (typeof req.session.userRole !== 'undefined' && req.session.userRole === 'admin') ? await db.collection('usuarios').find({}, { projection: { password: 0 } }).toArray() : [];
+            return res.status(500).render('reserva', { reservas: [], canchas, usuarios, error: 'Error al editar la reserva', backTo: '/reservas' });
+          } catch (err) {
+            return res.status(500).send('Error al editar la reserva');
+          }
+        }
+        res.status(500).send('Error al editar la reserva');
     }
   },
   // Eliminar reserva

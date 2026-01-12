@@ -116,6 +116,17 @@ footer {
   align-items: center;
   gap: 0.5rem;
 }
+
+/* Cuando el contenedor está centrado, permitir interacción con el contenido de la página
+   y sólo capturar eventos en el propio mensaje. Esto evita que la UI quede "tildada".
+*/
+.messages-container.messages-centered {
+  pointer-events: none;
+}
+.messages-container.messages-centered .message {
+  pointer-events: auto;
+  z-index: 1070;
+}
 .message .countdown {
   display: inline-block;
   min-width: 26px;
